@@ -1,0 +1,328 @@
+{
+  "info": {
+    "_postman_id": "c67fa8a2-course-enrollment-system",
+    "name": "Course Enrollment System API",
+    "description": "Complete collection for Course Enrollment System backend with Authentication, Course Browsing, Student Enrollments, Capacity Guard, and Admin Management.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "courseId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "enrollmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        },
+        "description": "Check if API server is running and healthy"
+      }
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register User (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student.demo@example.com\",\n  \"password\": \"student123\",\n  \"displayName\": \"Demo Student\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Registers a new student account (password will be hashed and stripped from response)"
+          }
+        },
+        {
+          "name": "Login - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"student123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Sign in as student. Issues HTTP-only JWT cookie."
+          }
+        },
+        {
+          "name": "Login - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Sign in as bootstrap admin account. Issues HTTP-only JWT cookie."
+          }
+        },
+        {
+          "name": "Get Profile (/me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "me"]
+            },
+            "description": "Returns current authenticated user details"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "logout"]
+            },
+            "description": "Clears the authentication JWT cookie"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Courses (Public)",
+      "item": [
+        {
+          "name": "Get All Active Courses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"]
+            },
+            "description": "Public list of all active courses with seat availability"
+          }
+        },
+        {
+          "name": "Get Single Course by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}"]
+            },
+            "description": "Get detailed info of a course by ID"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Enrollments (Student)",
+      "item": [
+        {
+          "name": "Enroll in Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseId\": \"{{courseId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments"]
+            },
+            "description": "Atomic enrollment check with capacity guard and duplicate prevention"
+          }
+        },
+        {
+          "name": "Get My Enrollments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", "my"]
+            },
+            "description": "List current student's enrollments including active and dropped history"
+          }
+        },
+        {
+          "name": "Drop Enrollment",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/enrollments/{{enrollmentId}}/drop",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "enrollments", "{{enrollmentId}}", "drop"]
+            },
+            "description": "Drop enrollment if course allows drops. Preserves historical record and decrements enrolledCount."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Admin - Course Management",
+      "item": [
+        {
+          "name": "Create Course (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cloud Computing Architecture\",\n  \"description\": \"Comprehensive guide to microservices and cloud deployment.\",\n  \"instructor\": \"Dr. Kumar\",\n  \"capacity\": 3,\n  \"allowDrops\": true,\n  \"allowReEnrollment\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courses"]
+            },
+            "description": "Admin creates a new course"
+          }
+        },
+        {
+          "name": "Update Course (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cloud Computing Architecture (Advanced)\",\n  \"description\": \"Updated curriculum with Kubernetes and CI/CD pipelines.\",\n  \"instructor\": \"Dr. Kumar\",\n  \"capacity\": 5,\n  \"allowDrops\": true,\n  \"allowReEnrollment\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courses/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courses", "{{courseId}}"]
+            },
+            "description": "Admin updates course. Capacity cannot be reduced below current enrolled count."
+          }
+        },
+        {
+          "name": "Deactivate Course (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courses/{{courseId}}/deactivate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courses", "{{courseId}}", "deactivate"]
+            },
+            "description": "Admin deactivates course. Blocked if course still has active enrollments."
+          }
+        },
+        {
+          "name": "View Course Enrollments (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/courses/{{courseId}}/enrollments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "courses", "{{courseId}}", "enrollments"]
+            },
+            "description": "Admin views all student enrollments for a specific course"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin - User Roles",
+      "item": [
+        {
+          "name": "Update User Role (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/{{userId}}/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", "{{userId}}", "role"]
+            },
+            "description": "Admin promotes/demotes a user (USER or ADMIN)"
+          }
+        }
+      ]
+    }
+  ]
+}
